@@ -1,20 +1,14 @@
 FROM jupyter/pyspark-notebook
 
-WORKDIR /home/jovyan/work/
+USER root
 
-COPY requirements.txt .
+# Your GCS connector jar file
+COPY extra/connectors/gcs-connector-latest-hadoop2.jar /usr/local/spark/jars/
 
-RUN pip install --no-cache-dir -r requirements.txt
+WORKDIR $HOME
 
-COPY . .
+# Your GCS JSON acess credentials for bucket
+COPY extra/credentials/ornate-spring-379820-00ec27d088ba.json .
 
-# Adicionando os parâmetros solicitados
-ENV CHOWN_HOME=yes
-ENV CHOWN_EXTRA_OPTS='-R'
-ENV NB_USER="${USER}"
-
-EXPOSE 8888
-
-
-# to build image: docker build -t pyspark-jupyter-image .
-# to run container: docker run -p 8888:8888 pyspark-jupyter-image
+# Python/Pyspark jobs location
+COPY dags/python_jobs/ .
